@@ -1,4 +1,5 @@
 package version1;
+import java.io.*;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -9,7 +10,7 @@ public class DnsServer {
 		DatagramSocket serverSocket= new DatagramSocket(12345);
 		//create serversocket on port 12345, using UDP protocol
 		
-		byte buf[]= new byte [100];
+		byte buf[]= new byte [200];
 		DatagramPacket receivePacket = new DatagramPacket(buf,buf.length);
 		System.out.println("DNSServer is started, ready for query...");
 		System.out.println("-----------------------------------------------");
@@ -24,17 +25,48 @@ public class DnsServer {
 			String answer=new String();
 			for (InetAddress addr : addresses) { 
 				System.out.println(addr.getHostAddress()); 
-				answer=answer+"/"+addr.getHostAddress();
+				answer=addr.getHostAddress()+"/"+answer;
 			} 
 			//use array for a host may have multiple ip address 
 			
-			byte[] data=new byte[100];
-			data=answer.getBytes();
-			DatagramPacket sendPacket= new DatagramPacket(data,answer.length(),receivePacket.getAddress(),receivePacket.getPort());
-			serverSocket.send(sendPacket);
-			System.out.print("已发送回复");
-
+			byte[] data=new byte[200];
+			
+			if(testForbidden(str)==false) {
+				data=answer.getBytes();
+				DatagramPacket sendPacket= new DatagramPacket(data,answer.length(),receivePacket.getAddress(),receivePacket.getPort());
+				serverSocket.send(sendPacket);
+				System.out.print("已发送回复");
+			}
+			else {
+				String noAnswer ="not found!";//中文字符传递客户端只能收到前三个？
+				data=noAnswer.getBytes();
+				DatagramPacket sendPacket= new DatagramPacket(data,noAnswer.length(),receivePacket.getAddress(),receivePacket.getPort());
+				serverSocket.send(sendPacket);
+				System.out.println("client查找"+str+"的ip讯息已被屏蔽");
+			}
 		}
+		//serverSocket.close();
+	}
+	public static boolean testForbidden(String str) {
+		boolean flag = false;
+		try {
+			String pathname = "D:\\learning\\Javademo\\MyDnsResolver\\MyDnsResolver\\src\\version1\\blacklist.txt";
+			File filename = new File(pathname); 
+			InputStreamReader reader = new InputStreamReader(new FileInputStream(filename)); 
+			BufferedReader br = new BufferedReader(reader); 
+			//open the txt file check if this host is in the blacklist
+			String line = null;
+			line = br.readLine();
+			while (line != null) {
+				if(line.equals(str)) {
+					flag = true;
+				}
+				line = br.readLine(); // 一次读入一行数据			
+			}
+			}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return flag;
 	}
 
 }
