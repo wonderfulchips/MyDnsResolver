@@ -37,7 +37,7 @@ public class DnsServer {
 						data=answer.getBytes();
 						DatagramPacket sendPacket= new DatagramPacket(data,answer.length(),receivePacket.getAddress(),receivePacket.getPort());
 						serverSocket.send(sendPacket);
-						System.out.print("已发送回复");
+						System.out.println("已发送回复");
 					}
 					else {
 						String noAnswer ="not found!";//中文字符传递客户端只能收到前三个？
@@ -49,7 +49,7 @@ public class DnsServer {
 				} catch (Exception e) {
 					//如果getallbyname()无法解析该域名则解析失败
 					System.out.println("解析域名失败!");
-					String noAnswer ="please input the correct domain name！";//中文字符传递客户端只能收到前三个？
+					String noAnswer ="please input the correct domain name";//中文字符传递客户端只能收到前三个？
 					data=noAnswer.getBytes();
 					DatagramPacket sendPacket= new DatagramPacket(data,noAnswer.length(),receivePacket.getAddress(),receivePacket.getPort());
 					serverSocket.send(sendPacket);
